@@ -8,7 +8,7 @@ import config
 # dtype str to keep from losing leading zeros on pins
 gc_dict = pd.read_csv(config.gcFileName, dtype=str).to_dict()
 gc_count = len(gc_dict['GC'])
-print('Loaded {} cards'.format(str(gc_count + 1)))
+print('Loaded {} cards'.format(str(gc_count)))
 
 # stuff to run this headless in the future
 # chrome_options.add_argument("--headless")
@@ -36,7 +36,7 @@ while loop < gc_count:
             driver.quit()
             time.sleep(10)
             retry_flag = True
-            driver = get_chromedriver(use_proxy=True)
+            driver = get_chromedriver(config.proxy_dict, use_proxy=True)
             continue
         else:
             gc_dict['Bal'][loop] = 'Error'
@@ -53,7 +53,7 @@ while loop < gc_count:
                 driver.quit()
                 time.sleep(10)
                 retry_flag = True
-                driver = get_chromedriver(use_proxy=True)
+                driver = get_chromedriver(config.proxy_dict, use_proxy=True)
                 continue
             else:
                 gc_dict['Bal'][loop] = 'Error'
@@ -63,7 +63,7 @@ while loop < gc_count:
     if ip_loop > 19:
         driver.quit()
         time.sleep(60)
-        driver = get_chromedriver(use_proxy=True)
+        driver = get_chromedriver(config.proxy_dict, use_proxy=True)
         ip_loop = 0
     retry_flag = False
     time.sleep(2)
