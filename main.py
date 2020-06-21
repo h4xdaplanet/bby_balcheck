@@ -41,7 +41,7 @@ while loop < gc_count:
         else:
             gc_dict['Bal'][loop] = 'Error'
             print('Error for card {}'.format(card))
-            gc_dict['Bal'][loop] = 'Error'
+
 
     else:
         try:
