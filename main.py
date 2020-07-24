@@ -2,6 +2,7 @@ import pandas as pd
 from proxy_helper import get_chromedriver
 import time
 import config
+from datetime import datetime
 
 
 # load gcs from csv
@@ -34,9 +35,10 @@ while loop < gc_count:
     if driver.find_elements_by_class_name('has-error'):
         if retry_flag is False:
             driver.quit()
-            time.sleep(10)
+            time.sleep(60)
             retry_flag = True
             driver = get_chromedriver(config.proxy_dict, use_proxy=True)
+            ip_loop = 0
             continue
         else:
             gc_dict['Bal'][loop] = 'Error'
@@ -51,9 +53,10 @@ while loop < gc_count:
         except:
             if retry_flag is False:
                 driver.quit()
-                time.sleep(10)
+                time.sleep(60)
                 retry_flag = True
                 driver = get_chromedriver(config.proxy_dict, use_proxy=True)
+                ip_loop = 0
                 continue
             else:
                 gc_dict['Bal'][loop] = 'Error'
@@ -66,8 +69,9 @@ while loop < gc_count:
         driver = get_chromedriver(config.proxy_dict, use_proxy=True)
         ip_loop = 0
     retry_flag = False
-    time.sleep(2)
+    time.sleep(1)
 
 df = pd.DataFrame.from_dict(gc_dict)
-df.to_csv(config.outputFile)
+dt_string = now.strftime("%d-%m-%Y-%H%M")
+df.to_excel('output-{}.xlsx'.format(dt_string))
 driver.quit()
