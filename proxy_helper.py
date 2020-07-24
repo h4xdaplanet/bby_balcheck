@@ -71,6 +71,8 @@ def get_chromedriver(proxy_dict=None, use_proxy=False, user_agent=None):
         chrome_options.add_extension(pluginfile)
     if user_agent:
         chrome_options.add_argument('--user-agent=%s' % user_agent)
+    prefs = {"profile.managed_default_content_settings.images": 2}
+    chrome_options.add_experimental_option("prefs", prefs)
     driver = webdriver.Chrome(
         ChromeDriverManager().install(),
         chrome_options=chrome_options)
