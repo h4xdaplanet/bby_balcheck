@@ -17,8 +17,29 @@ print('Loaded {} cards'.format(str(gc_count)))
 
 loop = 0
 ip_loop = 0
+prox_id = 0
 retry_flag = False
-driver = get_chromedriver(config.proxy_dict, use_proxy=True)
+proxy_len = len(config.host)
+proxy_dict = {
+    'host': config.host[0],
+    'port': config.port,
+    'user': config.user,
+    'passwd': config.passwd
+}
+
+def refreshProxy():
+    global prox_id
+    global proxy_dict
+    if prox_id < proxy_len:
+        prox_id += 1
+    else: prox_id = 0
+    proxy_dict = {
+        'host': config.host[prox_id],
+        'port': config.port,
+        'user': config.user,
+        'passwd': config.passwd
+    }
+driver = get_chromedriver(proxy_dict, use_proxy=True)
 
 while loop < gc_count:
     card = gc_dict['GC'][loop]
@@ -35,9 +56,10 @@ while loop < gc_count:
     if driver.find_elements_by_class_name('has-error'):
         if retry_flag is False:
             driver.quit()
-            time.sleep(60)
+            time.sleep(3)
             retry_flag = True
-            driver = get_chromedriver(config.proxy_dict, use_proxy=True)
+            refreshProxy()
+            driver = get_chromedriver(proxy_dict, use_proxy=True)
             ip_loop = 0
             continue
         else:
@@ -53,9 +75,10 @@ while loop < gc_count:
         except:
             if retry_flag is False:
                 driver.quit()
-                time.sleep(60)
+                time.sleep(3)
                 retry_flag = True
-                driver = get_chromedriver(config.proxy_dict, use_proxy=True)
+                refreshProxy()
+                driver = get_chromedriver(proxy_dict, use_proxy=True)
                 ip_loop = 0
                 continue
             else:
@@ -65,13 +88,15 @@ while loop < gc_count:
     ip_loop += 1
     if ip_loop > 19:
         driver.quit()
-        time.sleep(60)
-        driver = get_chromedriver(config.proxy_dict, use_proxy=True)
+        time.sleep(3)
+        refreshProxy()
+        driver = get_chromedriver(proxy_dict, use_proxy=True)
         ip_loop = 0
     retry_flag = False
     time.sleep(1)
 
 df = pd.DataFrame.from_dict(gc_dict)
+now = datetime.now()
 dt_string = now.strftime("%d-%m-%Y-%H%M")
 df.to_excel('output-{}.xlsx'.format(dt_string))
 driver.quit()
